@@ -53,7 +53,7 @@ const Category = () => {
     sliderRef.slickPrev();
   };
   return (
-    <main className="mt-20 w-[90%] mx-auto h-[60vh] space-y-12">
+    <main className="mt-20 w-[90%] mx-auto min-h-[60vh] space-y-12">
       <div className="flex justify-between items-center">
         <h1 className="font-bold text-2xl uppercase">Browse by category</h1>
         <div className="space-x-2 text-white">
