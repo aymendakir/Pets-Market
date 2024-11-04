@@ -1,4 +1,5 @@
 import Slider from "react-slick";
+import { Checkbox } from "@/components/ui/checkbox";
 
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
@@ -9,7 +10,7 @@ import food from "../../../assets/Images/food.jpg";
 import furniture from "../../../assets/Images/furniture.jpg";
 import bags from "../../../assets/Images/pags.jpg";
 import bath from "../../../assets/Images/soin.jpg";
-const CategoryPets = () => {
+const CategoryPetsShop = () => {
   let settings = {
     dots: false,
     infinite: true,
@@ -223,4 +224,4 @@ const CategoryPets = () => {
   );
 };
 
-export default CategoryPets;
+export default CategoryPetsShop;

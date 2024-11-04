@@ -1,7 +1,7 @@
 import heroImages from "../../../assets/Images/herosImage.png";
-function Heros() {
+function Hero() {
   return (
-    <main className="w-full h-[80vh] flex justify-between items-center relative overflow-hidden ">
+    <main className="w-full h-[55vh] flex justify-between items-center  relative overflow-hidden ">
       <div className="absolute left-32 -top-20 -z-10">
         <svg
           width="180"
@@ -58,11 +58,8 @@ function Heros() {
       <div className="ml-16">
         <h1 className="uppercase text-orange-400">pets shop</h1>
         <p className="text-[50px] w-[80%] leading-[70px] uppercase font-bold">
-          A pet store with everything you need
+          The friendly and caring small pet store
         </p>
-        <button className="w-[130px] h-[35px] bg-black rounded-xl text-white mt-5">
-          SHOP NOW
-        </button>
       </div>
       <div className="-translate-y-16 relative">
         {" "}
@@ -566,11 +563,11 @@ function Heros() {
           id="image2_1_3630"
           src={heroImages}
           alt="car & dog"
-          className="absolute left-1/2 top-1/2  w-[60%] h-[60%] -translate-x-1/2 -translate-y-[23%]"
+          className="absolute left-1/2 top-1/2  w-[60%] h-[60%] -translate-x-1/2 -translate-y-[30%]"
         />
       </div>
     </main>
   );
 }
 
-export default Heros;
+export default Hero;

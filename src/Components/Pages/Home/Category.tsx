@@ -57,10 +57,18 @@ const Category = () => {
       <div className="flex justify-between items-center">
         <h1 className="font-bold text-2xl uppercase">Browse by category</h1>
         <div className="space-x-2 text-white">
-          <button onClick={previous} className="bg-black p-1 rounded-lg px-3">
+          <button
+            name="previous"
+            onClick={previous}
+            className="bg-black p-1 rounded-lg px-3"
+          >
             <ChevronLeft />
           </button>
-          <button onClick={next} className="bg-black p-1 rounded-lg px-3">
+          <button
+            name="next"
+            onClick={next}
+            className="bg-black p-1 rounded-lg px-3"
+          >
             <ChevronRight />
           </button>
         </div>
