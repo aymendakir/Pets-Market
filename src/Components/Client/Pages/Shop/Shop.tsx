@@ -8,7 +8,7 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "../../../components/ui/select";
+} from "@/Components/Client/UI/select";
 import Card from "./Card";
 import Footer from "../Home/Footer";
 const Shop = () => {

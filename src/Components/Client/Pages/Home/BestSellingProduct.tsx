@@ -1,5 +1,5 @@
-import React from "react";
-import CardFeatured from "../../UI/CardFetured";
+
+import CardFeatured from "@/Components/Client/UI/CardFetured";
 function BestSellingProduct() {
   return (
     <main className="mt-20 w-[90%] mx-auto min-h-[90vh] mb-10">

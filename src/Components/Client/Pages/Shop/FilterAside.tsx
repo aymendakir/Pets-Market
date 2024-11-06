@@ -1,4 +1,4 @@
-import { Checkbox } from "../../UI/checkbox";
+import { Checkbox } from "@/Components/Client/UI/checkbox";
 import React, { useState } from "react";
 import PriceFilter from "./PriceFilter";
 

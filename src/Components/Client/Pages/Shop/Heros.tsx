@@ -1,4 +1,4 @@
-import heroImages from "../../../assets/Images/herosImage.png";
+import heroImages from "@/assets/Images/herosImage.png";
 function Hero() {
   return (
     <main className="w-full h-[55vh] flex justify-between items-center  relative overflow-hidden ">

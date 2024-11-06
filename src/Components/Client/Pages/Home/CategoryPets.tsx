@@ -1,16 +1,15 @@
 import Slider from "react-slick";
-import { Checkbox } from "@/components/ui/checkbox";
 
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import { useRef } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import cats from "../../../assets/Images/cat-9152.png";
-import food from "../../../assets/Images/food.jpg";
-import furniture from "../../../assets/Images/furniture.jpg";
-import bags from "../../../assets/Images/pags.jpg";
-import bath from "../../../assets/Images/soin.jpg";
-const CategoryPetsShop = () => {
+import cats from "@/assets/Images/cat-9152.png";
+import food from "@/assets/Images/food.jpg";
+import furniture from "@/assets/Images/furniture.jpg";
+import bags from "@/assets/Images/pags.jpg";
+import bath from "@/assets/Images/soin.jpg";
+const CategoryPets = () => {
   let settings = {
     dots: false,
     infinite: true,
@@ -224,4 +223,4 @@ const CategoryPetsShop = () => {
   );
 };
 
-export default CategoryPetsShop;
+export default CategoryPets;

@@ -2,7 +2,7 @@ import { Heart } from "lucide-react";
 
 function Card() {
   return (
-    <section className="w-[100%] h-[320px]  bg-white shadow-sm shadow-gray-200 rounded-[20px]">
+    <section className="w-[90%] h-[320px]  bg-white shadow-sm shadow-gray-200 rounded-[20px]">
       <div className="image w-full h-[78%] bg-gray-200 rounded-t-[20px]"></div>
       <div className="mt-2 flex flex-col justify-center  ">
         <div className="flex justify-between items-center mx-2">

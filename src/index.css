@@ -3,11 +3,7 @@
 @tailwind utilities;
 @import url("https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,200..1000;1,200..1000&display=swap");
 
-* {
-  font-family: "Nunito", sans-serif;
-  font-optical-sizing: auto;
-  font-style: normal;
-}
+
 header {
   overflow: hidden;
 }
@@ -80,4 +76,45 @@ header {
     -webkit-appearance: none;
     margin: 0;
   }
+}
+.navigationButton {
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 200ms ease-in-out, visibility 200ms ease-in-out;
+}
+
+.sliderSimilair:hover .navigationButton {
+  opacity: 1;
+  visibility: visible;
+}
+
+@font-face {
+  font-family: 'Nexa-ExtraLight';
+  src: url('@/assets/Font/Nexa-ExtraLight.ttf') ,
+  url('@/assets/Font/Nexa-ExtraLight.ttf') ;
+  font-weight: normal;
+  font-style: normal;
+}
+.poppinsblack{
+  font-family: Nexa-ExtraLight;
+}
+@font-face {
+  font-family: 'Nexa-Heavy';
+  src: url('@/assets/Font/Nexa-Heavy.ttf') ,
+  url('@/assets/Font/Nexa-Heavy.ttf') ;
+  font-weight: normal;
+  font-style: normal;
+}
+.NexaHeavy{
+  font-family: Nexa-Heavy;
+}
+@font-face {
+  font-family: 'Insanibu';
+  src: url('@/assets/Font/Insanibc.ttf') ,
+  url('@/assets/Font/Insanibc.ttf') ;
+  font-weight: normal;
+  font-style: normal;
+}
+.Insanibu{
+  font-family: Insanibu;
 }
