@@ -1,5 +1,5 @@
 import Slider from "react-slick";
-import Card from "../Shop/Card";
+
 import { useRef } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
@@ -72,11 +72,7 @@ function SimilarProduct() {
         }}
         className=" ml-10 "
       >
-        <Card />
-        <Card />
-        <Card />
-        <Card />
-        <Card />
+
       </Slider>
     </main>
   );

@@ -1,37 +1,59 @@
 import { Checkbox } from "@/Components/Client/UI/checkbox";
-import React, { useState } from "react";
+import React, {useContext, useState} from "react";
 import PriceFilter from "./PriceFilter";
-
-type Item = {
-  id: string;
-  label: string;
+import {ApiContext} from "@/Context/ClientContext.tsx";
+import {useQuery} from "@tanstack/react-query";
+type Product = {
+  seller_id: number|undefined;
+  title: string;
+  description?: string;
+  price: number;
+  FinaleImages: string[];
+  stock: number;
+  colors?: string[]|null;
+  sizes?: string[]|null;
+  category: string;
+  pets?: string[];
+  tags?: string[];
+  Images:{name:string}[]
 };
 
-const items: readonly Item[] = [
-  { id: "recents", label: "Recents" },
-  { id: "home", label: "Home" },
-  { id: "applications", label: "Applications" },
-  { id: "desktop", label: "Desktop" },
-  { id: "downloads", label: "Downloads" },
-  { id: "documents", label: "Documents" },
-];
+type FilterProps={
+  CategoryValue:(data:string[])=>void,
+  BrandValue:(data:string[])=>void,
+  PriceValue:(min:number,max:number)=>void
+  pets:string,
+  data:Product[]
+}
 
-function FilterAside() {
+function FilterAside({CategoryValue,BrandValue,PriceValue,pets,data}: Readonly<FilterProps>) {
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
-
-  const handleCheckboxChange = (id: string) => {
-    setSelectedCategories((prev) =>
-      prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id]
-    );
-  };
   const [minPrice, setMinPrice] = useState(0);
   const [maxPrice, setMaxPrice] = useState(1000);
+  const { FetchCategory } = useContext(ApiContext);
+  const { data: ListCategory } = useQuery(["ListCategoryShop"], FetchCategory, {
+    refetchOnWindowFocus: false,
+    refetchIntervalInBackground: false,
+    refetchInterval: false,
+  });
+  const handleCheckboxChange = (id: string) => {
+    setSelectedCategories((prev) => {
+      const data = prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id];
+      CategoryValue(data);
+      return data;
+    });
+
+  };
+
   const HandleMin = (min: number) => {
     setMinPrice(min);
+    PriceValue(min,maxPrice)
   };
 
   const HandleMax = (max: number) => {
     setMaxPrice(max);
+    PriceValue(minPrice,max)
+
   };
 
   return (
@@ -41,19 +63,21 @@ function FilterAside() {
           Filter By Category
         </p>
         <div className="flex flex-col justify-center items-start gap-4 ">
-          {items.map((item) => (
+          {ListCategory?.success&&ListCategory.response.map((item) => (
             <label
-              key={item.id}
+              key={item.category_id}
               className="flex items-center justify-between gap-2 text-lg uppercase w-full"
             >
               <Checkbox
-                checked={selectedCategories.includes(item.id)}
-                onClick={() => handleCheckboxChange(item.id)}
+                checked={selectedCategories.includes(item.category_name)}
+                onClick={() => handleCheckboxChange(item.category_name)}
               />
               <div className="flex w-full justify-between gap-10">
-                <p className="flex justify-start">{item.label}</p>
+                <p className="flex justify-start">{item.category_name}</p>
                 <span className=" w-5 h-5 bg-orange-400 rounded-full text-[12px] flex justify-center items-center text-center">
-                  22
+                {data?.filter(index=>{
+                  return index.category === item.category_name ;
+                }).length}
                 </span>
               </div>
             </label>
@@ -69,31 +93,46 @@ function FilterAside() {
       <div className="flex flex-col items-start ml-16 gap-5 mt-7">
         <p className="text-xl font-semibold text-center">Filter By Category</p>
         <div className="flex flex-col justify-center items-start gap-4 ">
-          {items.map((item) => (
-            <label
-              key={item.id}
-              className="flex items-center justify-center gap-2 text-lg uppercase"
-            >
-              <Checkbox
-                checked={selectedCategories.includes(item.id)}
-                onClick={() => handleCheckboxChange(item.id)}
-              />
-
-              {item.label}
-            </label>
+          {ListCategory?.success && ListCategory.response.map((item) => (
+              <label
+                  key={item.category_id}
+                  className="flex items-center justify-between gap-2 text-lg uppercase w-full"
+              >
+                <Checkbox
+                    checked={selectedCategories.includes(item.category_name)}
+                    onClick={() => handleCheckboxChange(item.category_name)}
+                />
+                <div className="flex w-full justify-between gap-10">
+                  <p className="flex justify-start">{item.category_name}</p>
+                  <span
+                      className=" w-5 h-5 bg-orange-400 rounded-full text-[12px] flex justify-center items-center text-center">
+                  {ListCategory?.response.length}
+                </span>
+                </div>
+              </label>
           ))}
         </div>
       </div>
       <div className="flex flex-col items-start ml-16 gap-5 mt-7">
         <p className="text-xl font-semibold text-center">Filter By Tag</p>
-        <div className="flex flex-wrap justify-start items-start gap-4 ">
-          {items.map((item) => (
-            <label
-              key={item.id}
-              className="  gap-2 text-[10px] uppercase p-1 bg-gray-200 rounded-full font-bold"
-            >
-              {item.label}{" "}
-            </label>
+        <div className="flex flex-col justify-center items-start gap-4 ">
+          {ListCategory?.success && ListCategory.response.map((item) => (
+              <label
+                  key={item.category_id}
+                  className="flex items-center justify-between gap-2 text-lg uppercase w-full"
+              >
+                <Checkbox
+                    checked={selectedCategories.includes(item.category_name)}
+                    onClick={() => handleCheckboxChange(item.category_name)}
+                />
+                <div className="flex w-full justify-between gap-10">
+                  <p className="flex justify-start">{item.category_name}</p>
+                  <span
+                      className=" w-5 h-5 bg-orange-400 rounded-full text-[12px] flex justify-center items-center text-center">
+                  {ListCategory?.response.length}
+                </span>
+                </div>
+              </label>
           ))}
         </div>
       </div>

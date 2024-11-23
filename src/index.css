@@ -118,3 +118,54 @@ header {
 .Insanibu{
   font-family: Insanibu;
 }
+.card-option{
+  opacity: 0;
+  transform: translateX(12px);
+  transition: opacity 200ms ease-in-out, transform 200ms ease-in-out;
+
+}
+.image-one{
+  transform: translateX(0);
+  transition:   transform 200ms ease-in-out;
+}
+.image-two{
+  transform: translateX(280px);
+  transition:   transform 200ms ease-in-out;
+}
+.card:hover{
+  .card-option{
+    opacity: 1;
+    transform: translateX(0);
+    transition: opacity 200ms ease-in-out, transform 200ms ease-in-out;
+
+  }
+  .image-one{
+    transform: translateX(-280px);
+    transition:   transform 200ms ease-in-out;
+  }
+  .image-two{
+    transform: translateX(0px);
+    transition:   transform 200ms ease-in-out;
+  }
+}
+.navigation-Product{
+  opacity: 0;
+
+  transition: opacity 200ms ease-in-out;
+}
+.new-product:hover{
+  .navigation-Product{
+    opacity: 1;
+
+    transition: opacity 200ms ease-in-out;
+  }
+}
+.add-to-cart {
+  opacity: 0;
+  transition: 0.5s ease-in-out;
+}
+.cart-show-hover:hover {
+  .add-to-cart {
+    opacity: 1;
+  }
+}

@@ -17,18 +17,19 @@
     "@tanstack/react-query-devtools": "^4.36.1",
     "axios": "^1.7.7",
     "class-variance-authority": "^0.7.0",
+    "cloudinary-react": "^1.8.1",
     "clsx": "^2.1.1",
-
     "jodit": "^4.2.41",
     "jodit-react": "^4.1.2",
+    "lodash": "^4.17.21",
     "lucide": "^0.454.0",
     "lucide-react": "^0.454.0",
-
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-hook-form": "^7.53.1",
     "react-router-dom": "^6.27.0",
     "react-slick": "^0.30.2",
+    "react-stars": "^2.2.5",
     "react-toastify": "^10.0.6",
     "slick-carousel": "^1.8.1",
     "swiper": "^11.1.14",
@@ -37,6 +38,7 @@
     "zod": "^3.23.8"
   },
   "devDependencies": {
+    "@babel/core": "^7.16.12",
     "@eslint/js": "^9.13.0",
     "@tanstack/eslint-plugin-query": "^4.38.0",
     "@types/draft-convert": "^2.1.8",
@@ -44,6 +46,7 @@
     "@types/react": "^18.3.12",
     "@types/react-dom": "^18.3.1",
     "@types/react-draft-wysiwyg": "^1.13.8",
+    "@types/react-stars": "^2.2.4",
     "@vitejs/plugin-react-swc": "^3.5.0",
     "autoprefixer": "^10.4.20",
     "eslint": "^9.13.0",

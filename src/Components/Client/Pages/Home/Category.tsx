@@ -1,15 +1,20 @@
 import Slider from "react-slick";
-
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
-import { useRef } from "react";
+import {useContext, useRef} from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import accessories from "@/assets/Images/Accesseoires.jpg";
-import food from "@/assets/Images/food.jpg";
-import furniture from "@/assets/Images/furniture.jpg";
-import bags from "@/assets/Images/pags.jpg";
 import bath from "@/assets/Images/soin.jpg";
+import {useQuery} from "@tanstack/react-query";
+import {ApiContext} from "@/Context/ClientContext.tsx";
 const Category = () => {
+  const { FetchCategory } = useContext(ApiContext);
+  const { data: ListCategory } = useQuery(["ListCategory"], FetchCategory, {
+    refetchOnWindowFocus: false,
+    refetchIntervalInBackground: false,
+    refetchInterval: false,
+  });
+
+
   let settings = {
     dots: false,
     infinite: false,
@@ -81,67 +86,23 @@ const Category = () => {
         }}
         className="grid grid-cols-4 lg:grid-cols-1  justify-items-center gap-x-20 poppinsblack "
       >
-        <div  className="h-[308px] !w-[90%]  bg-gray-50/80 rounded-[20px] shadow-sm shadow-slate-100 mb-4 "
-        >
-          <div className="image w-full h-[70%] bg-gray-200 rounded-t-[20px]">
-            <img
-              src={accessories}
-              alt="accessories"
-              title="accessories"
-              className="w-full h-full rounded-t-[20px]"
-            />
-          </div>
-          <p className="font-bold text-[20px] mt-2 ml-2">Accessories</p>
-          <p className="text-black/50 text-sm ml-2">20 Products</p>
-        </div>
-        <div className="h-[308px] !w-[90%]  bg-gray-50/80 rounded-[20px] shadow-sm shadow-slate-100">
-          <div className="image w-full h-[70%] bg-gray-200 rounded-t-[20px]">
-            <img
-              src={food}
-              alt="food"
-              title="food"
-              className="w-full h-full rounded-t-[20px]"
-            />
-          </div>
-          <p className="font-bold text-[20px] mt-2 ml-2">Food</p>
-          <p className="text-black/50 text-sm ml-2">20 Products</p>
-        </div>
-        <div className="h-[308px] !w-[90%]  bg-gray-50/80 rounded-[20px] shadow-sm shadow-slate-100">
-          <div className="image w-full h-[70%] bg-gray-200 rounded-t-[20px]">
-            <img
-              src={furniture}
-              alt="furniture"
-              title="furniture"
-              className="w-full h-full rounded-t-[20px]"
-            />
-          </div>
-          <p className="font-bold text-[20px] mt-2 ml-2">Furniture</p>
-          <p className="text-black/50 text-sm ml-2">20 Products</p>
-        </div>
-        <div className="h-[308px] !w-[90%]  bg-gray-50/80 rounded-[20px] shadow-sm shadow-slate-100">
-          <div className="image w-full h-[70%] bg-gray-200 rounded-t-[20px]">
-            <img
-              src={bags}
-              alt="bags"
-              title="bags"
-              className="w-full h-full rounded-t-[20px]"
-            />
-          </div>
-          <p className="font-bold text-[20px] mt-2 ml-2">Bags</p>
-          <p className="text-black/50 text-sm ml-2">20 Products</p>
-        </div>
-        <div className="h-[308px] !w-[90%]  bg-gray-50/80 rounded-[20px] shadow-sm shadow-slate-100 border border-gray-100">
-          <div className="image w-full h-[70%] bg-gray-200 rounded-t-[20px]">
-            <img
-              src={bath}
-              alt="bath"
-              title="bath"
-              className="w-full h-full rounded-t-[20px]"
-            />
-          </div>
-          <p className="font-bold text-[20px] mt-2 ml-2">Bath</p>
-          <p className="text-black/50 text-sm ml-2">20 Products</p>
-        </div>
+        {ListCategory?.success&&ListCategory.response.map((category,index)=> (
+            <div key={index} className="h-[308px] !w-[90%]  bg-gray-50/80 rounded-[20px] shadow-sm shadow-slate-100 mb-4 "
+            >
+              <div className="image w-full h-[70%] bg-gray-200 rounded-t-[20px]">
+                <img
+                    src={category?.Category_image}
+                    alt="accessories"
+                    title="accessories"
+                    className="w-full h-full rounded-t-[20px]"
+                />
+              </div>
+              <p className="font-bold text-[20px] mt-2 ml-2">{category?.category_name}</p>
+              <p className="text-black/50 text-sm ml-2">{category?.product_count} Products</p>
+            </div>
+        ))}
+
+
       </Slider>
     </main>
   );

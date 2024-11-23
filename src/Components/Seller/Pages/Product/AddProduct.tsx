@@ -1,13 +1,12 @@
 "use client"
-import {Aside} from "@/Components/Seller/Pages/Aside.tsx";
-import {Plus, Verified} from "lucide-react";
+import { Loader2, Plus, Verified} from "lucide-react";
 import {useForm, SubmitHandler} from "react-hook-form"
-import { z } from 'zod';
+import { z} from 'zod';
 import {zodResolver} from "@hookform/resolvers/zod";
 import {
 
     useContext,
-    useEffect, useMemo, useRef,
+     useRef,
     useState
 } from "react";
 import {
@@ -18,27 +17,68 @@ import {
     SelectValue,
 } from "@/Components/Client/UI/select";
 
+
+
+
 import {SellerContext} from "@/Context/SellerContext.tsx";
 import {useQuery} from "@tanstack/react-query";
 import JoditEditor from 'jodit-react';
 import { ImageUploader} from "@/Components/Seller/FunctionCloudinary/AddImage.tsx";
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import Multitext from "@/Components/Seller/UI/InputMultipe.tsx";
+import {UploadImage} from "@/Components/Seller/FunctionCloudinary/UploadImage.tsx";
+import {ApiContext} from "@/Context/ClientContext.tsx";
 
 
 
 const ProductSchema = z.object({
-    seller_id: z.number().optional(),
-    title: z.string().optional(),
-    description: z.string().optional(),
-    sizes: z.union([z.array(z.string()), z.boolean()]).optional(),
-    price: z.number().optional(),
-    stock: z.number().optional(),
-    colors: z.union([z.array(z.string()), z.boolean()]).optional(),
-    Tags: z.array(z.string()).optional(),
-    pets: z.number().optional(),
-    category: z.number().optional(),
-    Images: z.any(z.string()).optional(),
+    seller_id: z.number()
+        .min(1, { message: "Seller ID must be at least 1" })
+        .max(1000, { message: "Seller ID cannot exceed 1000" })
+        .optional(),
+
+    title: z.string()
+        .min(3, { message: "Title must be at least 3 characters long" })
+        .max(100, { message: "Title cannot exceed 100 characters" })
+        ,
+
+    description: z.string()
+        .min(10, { message: "Description must be at least 10 characters long" })
+
+        ,
+
+    sizes: z.any().optional(),
+
+    price: z.coerce.number()
+        .min(0.01, { message: "Price must be at least 0.01" })
+        .max(10000, { message: "Price cannot exceed 10000" })
+        ,
+
+    stock: z.coerce.number()
+        .min(1, { message: "Stock cannot be negative" })
+        .max(1000, { message: "Stock cannot exceed 1000" })
+        ,
+
+    colors: z.any().optional(),
+
+    Tags: z.array(z.string({ message: "Each tag must be a string" }))
+        .min(3, { message: "At least 3 tag is required" }),
+
+    pets: z.string({message: "pets cannot be null"})
+        .min(1, { message: "Pets must be at least 3 characters long" })
+        .max(50, { message: "Pets cannot exceed 50 characters" })
+        ,
+
+    category: z.string({message: "category cannot be null"})
+        .min(1, { message: "Category must be at least 3 characters long" })
+        .max(50, { message: "Category cannot exceed 50 characters" })
+       ,
+
+    Images: z.array(z.instanceof(File, { message: "Each image must be a file" }))
+        .min(1, { message: "At least one image is required" }),
+
+
 });
 const colorOptions = [
     {value: "red", label: "Red", color: "#ff0000"},
@@ -100,93 +140,145 @@ const config = {
     },
 };
 
+
 export function AddProduct() {
-    const {FetchCategory,FetchPets} = useContext(SellerContext)
-    const {data: ListCategory} = useQuery({
-        queryKey: ["ListCategory"],
-        queryFn: () => FetchCategory(),
-        refetchOnWindowFocus:false,
-        refetchIntervalInBackground:false,
-        refetchInterval:false
-    })
-    const {data: ListPets} = useQuery({
-        queryKey: ["ListPets"],
-        queryFn: () => FetchPets(),
-        refetchOnWindowFocus:false,
-        refetchIntervalInBackground:false,
-        refetchInterval:false
-    })
-
-
     const editor = useRef(null);
     const [content, setContent] = useState('');
-
-
     const [ColorsActive, setColorsActive] = useState(false);
-    const [SizesActive, setSizesActive] = useState(false)
+    const [SizesActive, setSizesActive] = useState(false);
     const [Size, setSize] = useState<string[]>([]);
     const [Color, setColor] = useState<string[]>([]);
-    const ImageDuplicated = () => toast.info("I Notice You Can't Add Dublicated Image!");
+    const [Loading, setLoading] = useState<boolean>(false)
+    const ImageDuplicated = () => toast.info("I Notice You Can't Add Duplicated Image!");
 
-    const ADDSIZEARR = (size: string) => {
-        setSize((prevSizes) => {
-            const updatedSizes = prevSizes.includes(size)
-                ? prevSizes.filter((existingSize) => existingSize !== size)
-                : [...prevSizes, size];
+const { FetchCategory, FetchPets, NewProduct } = useContext(SellerContext);
+const {User}=useContext(ApiContext)
 
-            setValue("sizes", updatedSizes);
+const { data: ListCategory } = useQuery(["ListCategory"], FetchCategory, {
+    refetchOnWindowFocus: false,
+    refetchIntervalInBackground: false,
+    refetchInterval: false,
+});
+const { data: ListPets } = useQuery(["ListPets"], FetchPets, {
+    refetchOnWindowFocus: false,
+    refetchIntervalInBackground: false,
+    refetchInterval: false,
+});
+const {data:useData}=useQuery({
+        queryKey:["UserData"],
+        queryFn:()=>{
+            return User()
+        },
+        refetchOnWindowFocus: false,
+        refetchIntervalInBackground: false,
+        refetchInterval: false,
+    })
 
-            return updatedSizes;
-        });
-    };
-    const ADDCOLORARR = (color: string) => {
-        setColor((prevColor) => {
-            const updatedColors = prevColor.includes(color)
-                ? prevColor.filter((existingColor) => existingColor !== color)
-                : [...prevColor, color];
+const ADDSIZEARR = (size: string) => {
+    setSize(prevSizes => {
+        const updatedSizes = prevSizes.includes(size)
+            ? prevSizes.filter(existingSize => existingSize !== size)
+            : [...prevSizes, size];
+        setValue("sizes", updatedSizes);
+        return updatedSizes;
+    });
+};
 
-            setValue("colors", updatedColors);
+const ADDCOLORARR = (color: string) => {
+    setColor(prevColor => {
+        const updatedColors = prevColor.includes(color)
+            ? prevColor.filter(existingColor => existingColor !== color)
+            : [...prevColor, color];
+        setValue("colors", updatedColors);
+        return updatedColors;
+    });
+};
 
-            return updatedColors;
-        });
-    };
+const handleImage = (imageData: File | null, Name: string | null) => {
+    const currentImages = getValues("Images") || [];
+    if (imageData === null) {
+        setValue("Images", currentImages.filter(image => image.name !== Name));
+        return;
+    }
+    if (currentImages.some(image => image.name === Name)) {
+        ImageDuplicated();
+        return;
+    }
+    setValue("Images", [...currentImages, imageData]);
+};
 
-    const handleImage = (imageData: File|null , Name:null|string) => {
-        if (imageData === null) {
-            const currentImages = getValues("Images") || [];
-            const updatedImages = currentImages.filter((image) => image.name !== Name);
-            setValue("Images", updatedImages);
-
-            return;
-        }
-
-        const currentImages = getValues("Images") || [];
-        if (currentImages.some((index) => index.name === Name)){
-            ImageDuplicated()
-        }
-        if (!currentImages.includes(imageData)) {
-            const updatedImages = [...currentImages, imageData];
-            setValue("Images", updatedImages);
-        }
-
-    };
+const { register, handleSubmit, setValue, getValues, formState: { errors } } = useForm<ProductSchemaType>({
+    resolver: zodResolver(ProductSchema),
+});
 
 
-    const {
-        register,
-        handleSubmit,
-        setValue,
-        getValues
-    } = useForm<ProductSchemaType>({resolver: zodResolver(ProductSchema)})
-    const onSubmit: SubmitHandler<ProductSchemaType> = (data) => console.log(data)
+    const onSubmit: SubmitHandler<ProductSchemaType> =async (data) => {
+        setLoading(true);
+        const arr: Promise<string[]> = Promise.all(
+            data.Images.map((img) =>
+                UploadImage(img, "PetsProduct").then((data) => data.public_id)
+            )
+        );
 
+
+        const handleUpload = async () => {
+            try {
+                const resolvedImages = await arr;
+
+                const serializedImages = resolvedImages.map((file) => ({
+                    name: file,
+                }));
+                const jsonSerializedImages = JSON.stringify(serializedImages);
+
+                const JsonTags=JSON.stringify(getValues("Tags"));
+                const JsonSize=JSON.stringify(getValues("sizes"));
+                const JsonColors=JSON.stringify(getValues("colors"));
+
+                const dataToSubmit = {
+                    ...data,
+                    FinaleImages: jsonSerializedImages,
+                    tags:JsonTags,
+                    colors:JsonColors,
+                    sizes:JsonSize,
+                    seller_id:useData?.seller.seller_id
+                };
+                await NewProduct({...dataToSubmit}).then((result)=>{
+                    if (result?.status === 201){
+                        setLoading(false);
+
+                    }else{
+                        setLoading(false);
+
+                    }
+
+                })
+            } catch (error) {
+                setLoading(false)
+                console.error("Error uploading images:", error);
+            }
+        };
+
+        handleUpload();
+
+    }
     return (
-        <main className={"flex"}>
+        <main >
+            <title>SELLER|NEW PRODUCT</title>
             <ToastContainer />
-            <div className={"w-[20%]"}>
-                <Aside/>
-            </div>
-            <div className={"w-[80%] mt-10"}>
+
+            <form onSubmit={handleSubmit(onSubmit)} className={""}>
+                {Loading&& (
+                    <div
+                        className={"fixed top-0 left-0 w-full h-full bg-gray-500/60 z-50 flex justify-center items-center"}>
+                        <div
+                            className={"bg-white rounded-lg w-[300px] h-[200px] flex flex-col justify-center items-center"}>
+                            <Loader2 className={"animate-spin"} size={70}/>
+                            <p className={"text-lg NexaHeavy"}>Just Wait...!</p>
+                        </div>
+                    </div>
+                )}
+
+
                 <header className={"flex justify-between items-center mx-7"}>
                     <div className={"flex flex-col justify-between items-start"}>
                         <h1 className={"NexaHeavy text-3xl"}>Add Product</h1>
@@ -199,14 +291,16 @@ export function AddProduct() {
                             <Verified size={30}/>Save Draf
                         </button>
                         <button
+                            type={"submit"}
                             className={"bg-orange-500 rounded-md flex justify-center items-center gap-5 font-bold text-sm p-2 NexaHeavy text-white"}>
-                            <Verified size={30}/>Add Product
+                            <Verified size={30}/>
+                            Add Product
                         </button>
                     </div>
                 </header>
-                <form onSubmit={handleSubmit(onSubmit)} className={"flex justify-between"}>
+                <div className={"flex justify-between"}>
                     <div className={"w-[60%] mx-7 mt-10"}>
-                        <button type="submit">dddd</button>
+
                         <div className={"bg-gray-100 rounded-lg px-3 py-5 "}>
                             <h1 className={"poppinsblack font-bold text-3xl"}>Generale Information</h1>
 
@@ -214,7 +308,10 @@ export function AddProduct() {
                                 <label className={""}>
                                     Name Product
                                 </label>
-                                <input  type="text" className={"p-3 rounded-md bg-gray-200 font-semibold"} {...register("title")}/>
+                                <input type="text"
+                                       className={"p-3 rounded-md bg-gray-200 font-semibold"} {...register("title")}/>
+                                <span className={"text-red-500"}>{errors.title?.message}</span>
+
                             </div>
                             <div className={"  poppinsblack ml-2 flex flex-col gap-2 mt-4 min-h-[360px]"}>
                                 <label className={""}>
@@ -225,14 +322,17 @@ export function AddProduct() {
                                     ref={editor}
                                     value={content}
                                     config={
-                                    config
+                                        config
                                     }
                                     onChange={newContent => {
                                         setContent(newContent)
-                                        setValue("description",newContent)
+                                        setValue("description", newContent)
 
                                     }}
+
                                 />
+                                <span className={"text-red-500"}>{errors.description?.message}</span>
+
                             </div>
                             <div className={"  poppinsblack ml-2 flex flex-col gap-2 mt-4"}>
                                 <label className={""}>
@@ -302,6 +402,8 @@ export function AddProduct() {
                                                 </div>
 
                                             </div>
+                                            <span className={"text-red-500"}>{errors?.sizes&&errors?.sizes?.message}</span>
+
                                         </div>
 
 
@@ -329,6 +431,8 @@ export function AddProduct() {
                                                 ))}
 
                                             </div>
+                                            <span className={"text-red-500"}>{errors.colors?.message}</span>
+
                                         </div>
                                     )
                                     }
@@ -344,14 +448,30 @@ export function AddProduct() {
                                     <label className={""}>
                                         Base Pricing
                                     </label>
-                                    <input type="number" className={"p-3 rounded-md bg-gray-200 font-semibold w-full"}/>
+                                    <input type="number"
+                                           className={"p-3 rounded-md bg-gray-200 font-semibold w-full"} {...register("price")}/>
+                                    <span className={"text-red-500"}>{errors.price?.message}</span>
                                 </div>
                                 <div className={" mt-4 poppinsblack font-bold ml-2 flex flex-col gap-2 w-1/2"}>
                                     <label className={""}>
                                         STOCK
                                     </label>
-                                    <input type="number" className={"p-3 rounded-md bg-gray-200 font-semibold "}/>
+                                    <input type="number"
+                                           className={"p-3 rounded-md bg-gray-200 font-semibold "} {...register("stock")}/>
+                                    <span className={"text-red-500"}>{errors.stock?.message}</span>
+
                                 </div>
+
+                            </div>
+                            <div className={" mt-4 poppinsblack font-bold ml-2 flex flex-col gap-2 w-full"}>
+                                <label className={""}>
+                                    Tags
+                                </label>
+                                <Multitext defaultValue={undefined} placeholder={"Tags"} inputClassName={undefined}
+                                           ValueClassName={undefined} DateValue={function (Data: string[]) {
+                                    setValue("Tags", Data)
+                                }}/>
+                                <span className={"text-red-500"}>{errors.Tags?.message}</span>
                             </div>
 
                         </div>
@@ -364,30 +484,31 @@ export function AddProduct() {
                                 <div
                                     className={"relative w-[90%] mx-auto border-4 border-dashed border-orange-500 rounded-lg h-[320px] flex items-center justify-center"}>
                                     <Plus size={40} className={"text-orange-400"}/>
-                                    <ImageUploader onImageChange={handleImage}  />
+                                    <ImageUploader onImageChange={handleImage}/>
                                 </div>
                                 <div>
                                     <div className={"flex items-center gap-3 mt-5"}>
                                         <div
                                             className={"relative w-[30%] mx-auto border border-dashed border-orange-500 rounded-lg h-[130px] flex items-center justify-center"}>
                                             <Plus size={40} className={"text-orange-400"}/>
-                                            <ImageUploader onImageChange={handleImage}  />
+                                            <ImageUploader onImageChange={handleImage}/>
 
                                         </div>
                                         <div
                                             className={"relative w-[30%] mx-auto border-2 border-dashed border-orange-500 rounded-lg h-[130px] flex items-center justify-center"}>
                                             <Plus size={40} className={"text-orange-400"}/>
-                                            <ImageUploader onImageChange={handleImage}  />
+                                            <ImageUploader onImageChange={handleImage}/>
                                         </div>
                                         <div
                                             className={"relative w-[30%] mx-auto border-2 border-dashed border-orange-500 rounded-lg h-[130px] flex items-center justify-center"}>
                                             <Plus size={40} className={"text-orange-400"}/>
-                                            <ImageUploader onImageChange={handleImage}  />
+                                            <ImageUploader onImageChange={handleImage}/>
                                         </div>
                                     </div>
 
                                 </div>
                             </div>
+                            <span className={"text-red-500"}>{errors.Images?.message}</span>
 
                         </div>
                         <div className={"bg-gray-100 rounded-lg px-3 py-5 mt-5"}>
@@ -396,42 +517,56 @@ export function AddProduct() {
                                 <label className={""}>
                                     Category
                                 </label>
-                                <Select>
+                                <Select onValueChange={data => setValue("category", data)}>
                                     <SelectTrigger className="p-3 rounded-md bg-gray-200 font-semibold ">
                                         <SelectValue placeholder="Category"/>
                                     </SelectTrigger>
                                     <SelectContent>
-                                        {ListCategory?.success ? ListCategory.response.map((Category: { Category_id: Key | number ; category_name: string   ;Category_image:string|undefined })=>(
-                                            <SelectItem key={Category.Category_id} value={Category.category_name}>{Category.category_name}</SelectItem>
+                                        {ListCategory?.success ? ListCategory.response.map((Category: {
+                                            Category_id: number;
+                                            category_name: string;
+                                            Category_image: string | undefined
+                                        }) => (
+                                            <SelectItem key={Category.Category_id}
+                                                        value={Category.category_name}>{Category.category_name}</SelectItem>
 
-                                        )):(
-                                            <SelectItem  defaultValue={"Loading..."} value={"Loading..."}>Loading...</SelectItem>
+                                        )) : (
+                                            <SelectItem defaultValue={"Loading..."}
+                                                        value={"Loading..."}>Loading...</SelectItem>
 
                                         )}
 
                                     </SelectContent>
                                 </Select>
+                                <span className={"text-red-500"}>{errors.category?.message}</span>
 
                             </div>
                             <div className={"mt-4 poppinsblack font-bold ml-2 flex flex-col gap-2"}>
                                 <label className={""}>
                                     Pet
                                 </label>
-                                <Select >
+                                <Select onValueChange={data => setValue("pets", data)}>
                                     <SelectTrigger className="p-3 rounded-md bg-gray-200 font-semibold   ">
-                                        <SelectValue placeholder="Pets" className="text-gray-500" />
+                                        <SelectValue placeholder="Pets" className="text-gray-500"/>
                                     </SelectTrigger>
                                     <SelectContent>
-                                        {ListPets?.success ? ListPets.response.map((Pets: { Pets_id: Key | number ; Pets_name: string   ;Pet_image:string|undefined })=>(
-                                            <SelectItem key={Pets.Pets_id} value={Pets.Pets_name}>{Pets.Pets_name}</SelectItem>
+                                        {ListPets?.success ? ListPets.response.map((Pets: {
+                                            Pets_id: number;
+                                            Pets_name: string;
+                                            Pet_image: string | undefined
+                                        }) => (
+                                            <SelectItem key={Pets.Pets_id}
+                                                        value={Pets.Pets_name}>{Pets.Pets_name}</SelectItem>
 
-                                        )):(
-                                            <SelectItem  defaultValue={"Loading..."} value={"Loading..."}>Loading...</SelectItem>
+                                        )) : (
+                                            <SelectItem defaultValue={"Loading..."}
+                                                        value={"Loading..."}>Loading...</SelectItem>
 
                                         )}
 
                                     </SelectContent>
                                 </Select>
+                                <span className={"text-red-500"}>{errors.pets?.message}</span>
 
                             </div>
                             <div className={"mt-4 poppinsblack font-bold ml-2 flex flex-col gap-2"}>
@@ -456,9 +591,9 @@ export function AddProduct() {
                         </div>
                     </div>
 
-                </form>
+                </div>
 
-            </div>
+            </form>
         </main>
     );
 }
